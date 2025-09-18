@@ -1,5 +1,6 @@
 // server.js
 import express from 'express';
+import cors from 'cors';
 import multer from 'multer';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import dotenv from 'dotenv';
@@ -24,6 +25,14 @@ logger.info('Server starting up', { version: '1.0.0' });
 
 const app = express();
 const port = process.env.PORT || 8080;
+
+// CORS middleware - must be before other middleware
+app.use(cors({
+  origin: ['http://localhost:3001', 'http://localhost:3000', 'https://api-cal-calorie.onrender.com'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Body parser middleware
 app.use(express.json());
