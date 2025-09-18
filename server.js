@@ -83,6 +83,16 @@ function fileToGenerativePart(buffer, mimeType) {
     return { inlineData: { data: buffer.toString("base64"), mimeType } };
 }
 
+// Root route for health checks
+app.get('/', (req, res) => {
+    res.json({ 
+        message: 'Gemini Calorie API Server', 
+        status: 'running',
+        version: '1.0.0',
+        timestamp: new Date().toISOString()
+    });
+});
+
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/food-analyses', foodAnalysisRoutes);
@@ -362,12 +372,13 @@ app.use((err, req, res, next) => {
 app.use(notFound);
 app.use(errorHandler);
 
-// Check if --host flag is provided
+// Check if --host flag is provided or if running on Render
 const hostFlag = process.argv.includes('--host');
-const hostname = hostFlag ? '0.0.0.0' : 'localhost';
+const isRender = process.env.RENDER || process.env.NODE_ENV === 'production';
+const hostname = hostFlag || isRender ? '0.0.0.0' : 'localhost';
 
 app.listen(port, hostname, () => {
-    if (hostFlag) {
+    if (hostFlag || isRender) {
         logger.success(`Server running at http://0.0.0.0:${port}/ (accessible from external networks)`);
     } else {
         logger.success(`Server running at http://localhost:${port}/`);
